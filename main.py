@@ -3,24 +3,34 @@
 #--------------------------------------------
 
 # Import modules and classes
-from game_objects import Weapon, Enemy
+from game_objects import Weapon, Enemy, Player # Import the Weapon, Enemy and Player classes from game_objects.py for use
 import random # import the random module
 import time # import the time module
 
+
+# Create characters
+players = [Player('Gandalf', 'Human', 'Wizard', 2, 100),
+           Player('Gimli', 'Dwarf', 'Fighter', 3, 180),
+           Player('Legolas', 'Elf', 'Archer', 1, 120 ),
+           Player('Aragorn', 'Human', 'Ranger', 4, 130)]
+
 # Create weapons
-w1 = Weapon('Face Smasher', 'Mace', 15)
-w2 = Weapon('Sword of Slaying', 'Sword', 10)
-weapons = [w1, w2]
+weapons =  [Weapon('Glamdring', 'Sword', random.randint(8, 12)), 
+            Weapon("Balin's Axe", 'Greataxe', random.randint(12, 15)), 
+            Weapon('Bow of the Galadhrim', 'Longbow', random.randint(10, 12)),
+            Weapon('Anduril', 'Great Sword', random.randint(10, 14))]
 
 # Create enemies
-e1 = Enemy('Azog', 'Orc Warrior', 10, 100)
-e2 = Enemy('Saruman', 'Human Wizard', 20, 40)
-enemies = [e1, e2]
+enemies = [Enemy('Azog', 'Orc Warrior', random.randint(15, 18), random.randint(80, 140)),
+           Enemy('Saruman', 'Human Wizard', random.randint(20, 30), random.randint(60, 100))]
+
 
 #Global Variables
 game_over = False
 player_health = 100
 player_attack = 1
+player = ''
+weapon = ''
 
 enemies_defeated = False
 
@@ -54,42 +64,63 @@ enemyX = random.randint(0, 4)
 enemyY = random.randint(0, 4)
 
 while enemyX == playerX and enemyX == playerY:
+    enemyX = random.randint(0, 4)
+    enemyY = random.randint(0, 4)
     while enemyX == exitX and enemyX == exitY:
         enemyX = random.randint(0, 4)
         enemyY = random.randint(0, 4)
 
 gameBoard[enemyX][enemyY] = 2
 
-weapon = weapons[random.randint(0, 1)]
-print(f'You equip: {weapon.name}')
+
+
+
+
 
 # ----------------------------------------- SET UP THE FUNCTIONS -----------------------------------------
 # create the def() functions for the program here
+def selectPlayer():
+    global player, weapon
+    player_selected = False
+    while player_selected == False:
+        try: 
+            p_choice = int(input('Enter 1 for Gandalf, 2 for Gimli, 3 for Legolas or 4 for Aragorn: '))
+            if p_choice > 0 and p_choice <= 4:
+                player = players[p_choice-1]
+                print(f'You have selected {player.name} the {player.race} {player.cls}!')
+                weapon = weapons[p_choice-1]
+                print(f'You are equipped with {weapon.name}, the {weapon.wpn}!')
+                player_selected = True
+        except:
+            print('Fool of a Took! Enter a number in the correct range!')
+
+
+
 def printBoard():
     for row in gameBoard:
         print(row)
 
 def Fight():
-    global enemy, player_health, player_attack, game_over, enemies_defeated
+    global enemy, player, game_over, enemies_defeated, weapon
     
     print(f'You encounter {enemy.name} the {enemy.type}!')
     choice = ''
-    while choice.lower() != 'r' and player_health >= 0 and enemy.health >= 0:
+    while choice.lower() != 'r' and player.health > 0 and enemy.health > 0:
         choice = input('A to attack, R to run: ')
         if choice.lower() == 'a':
-            player_health -= enemy.dmg
-            enemy.health -= (player_attack + weapon.dmg)
-            print(f'{enemy.name} deals {enemy.dmg} damage to you! Your health is now {player_health}!')
-            print(f'You have dealt {player_attack + weapon.dmg} with your {weapon.name}! The enemy is now on {enemy.health} health!')
+            player.health -= enemy.dmg
+            enemy.health -= (player.atk + weapon.dmg)
+            print(f'{enemy.name} deals {enemy.dmg} damage to you! Your health is now {player.health}!')
+            print(f'You have dealt {player.atk + weapon.dmg} with {weapon.name}! The enemy is now on {enemy.health} health!')
         elif choice.lower() == 'r':
             break
         else:
             print('Choose again plz')
 
     if enemy.health <= 0:
-        print('Congratulations, you beat the enemy!')
+        print(f'Congratulations, you beat {enemy.name}!')
         enemies_defeated = True
-    elif player_health <= 0:
+    if player.health <= 0:
         print('Death comes for us all...')
         game_over = True
 
@@ -150,6 +181,7 @@ def checkExit():
 
 # ----------------------------------------- MAIN LOOP -----------------------------------------
 # create the main loop for the program here
+selectPlayer()
 while game_over == False:
     printBoard()
     movePlayer()
