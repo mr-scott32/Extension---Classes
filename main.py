@@ -27,8 +27,6 @@ enemies = [Enemy('Azog', 'Orc Warrior', random.randint(15, 18), random.randint(8
 
 #Global Variables
 game_over = False
-player_health = 100
-player_attack = 1
 player = ''
 weapon = ''
 
